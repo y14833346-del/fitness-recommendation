@@ -70,6 +70,20 @@ def get_courses():
     })
 
 
+@app.route('/api/download-template', methods=['GET'])
+def download_template():
+    """下载测试数据模板"""
+    file_path = os.path.join(app.root_path, '测试数据.xlsx')
+    if os.path.exists(file_path):
+        return send_from_directory(
+            os.path.dirname(file_path),
+            '测试数据.xlsx',
+            as_attachment=True,
+            download_name='测试数据.xlsx'
+        )
+    return jsonify({"code": 1, "message": "文件不存在"})
+
+
 @app.route('/api/reset', methods=['POST'])
 def reset_state():
     """刷新页面时清除后端状态"""

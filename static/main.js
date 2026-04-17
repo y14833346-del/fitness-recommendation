@@ -110,6 +110,10 @@ function clearFile() {
     showSection('section-upload');
 }
 
+function downloadTemplate() {
+    window.location.href = '/api/download-template';
+}
+
 function resetUpload() {
     clearFile();
 }
