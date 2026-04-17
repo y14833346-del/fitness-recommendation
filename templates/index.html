@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>体测课程智能推荐系统</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="page">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🏃</span>
+                    <span class="logo-text">体测课程智能推荐</span>
+                </div>
+                <div class="header-tag">北京体育大学</div>
+            </div>
+        </header>
+
+        <!-- Progress Steps -->
+        <div class="progress-bar" id="progress-bar" style="display:none;">
+            <div class="progress-steps">
+                <div class="step" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">上传数据</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">数据预览</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">聚类分析</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">AI分析+课程咨询</div>
+                </div>
+            </div>
+            <div class="progress-text" id="progress-text">正在处理中...</div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Step 1: Upload -->
+            <section class="section active" id="section-upload">
+                <div class="card">
+                    <h2 class="card-title">上传体测数据</h2>
+                    <p class="card-desc">上传包含学生体测数据的 CSV 或 Excel 文件</p>
+
+                    <div class="upload-zone" id="upload-zone">
+                        <input type="file" id="file-input" accept=".csv,.xlsx,.xls" hidden>
+                        <div class="upload-content">
+                            <div class="upload-icon">📁</div>
+                            <div class="upload-text">拖拽文件到此处</div>
+                            <div class="upload-hint">或点击选择文件</div>
+                            <div class="upload-formats">支持 CSV、Excel 格式</div>
+                        </div>
+                    </div>
+
+                    <div class="file-preview" id="file-preview" style="display:none;">
+                        <div class="file-info">
+                            <span class="file-icon">📄</span>
+                            <div class="file-details">
+                                <div class="file-name" id="file-name"></div>
+                                <div class="file-size" id="file-size"></div>
+                            </div>
+                        </div>
+                        <button class="btn-icon" onclick="clearFile()">✕</button>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-primary btn-lg" id="btn-preprocess" disabled onclick="preprocessData()">
+                            开始预处理
+                            <span class="btn-icon-right">→</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 2: Preview -->
+            <section class="section" id="section-preview">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">数据预览</h2>
+                            <p class="card-desc">数据预处理完成，请确认数据无误</p>
+                        </div>
+                        <button class="btn btn-ghost" onclick="resetUpload()">重新上传</button>
+                    </div>
+
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-samples">-</div>
+                                <div class="stat-label">样本数量</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-indicators">-</div>
+                                <div class="stat-label">有效指标</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="data-table" id="preview-table">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-primary btn-lg" onclick="startClustering()">
+                            开始聚类分析
+                            <span class="btn-icon-right">→</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Clustering Analysis -->
+            <section class="section" id="section-clustering">
+                <!-- Loading State -->
+                <div class="card loading-card" id="clustering-loading">
+                    <div class="loading-animation">
+                        <div class="loading-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                    </div>
+                    <h2 class="loading-title" id="loading-title">正在分析数据...</h2>
+                    <p class="loading-status" id="loading-status">准备中</p>
+                </div>
+
+                <!-- Results State -->
+                <div class="card result-card" id="clustering-results" style="display:none;">
+                    <div class="result-header">
+                        <h2 class="card-title">聚类分析结果</h2>
+                        <div class="result-meta">
+                            <span class="meta-item">K=<span id="result-k">-</span></span>
+                        </div>
+                    </div>
+
+                    <!-- 聚类分析图表 -->
+                    <div class="chart-section" id="chart-section" style="display:none;">
+                        <h3 class="chart-title">聚类分析图表</h3>
+                        <div class="chart-container">
+                            <img id="elbow-plot" src="" alt="聚类分析图表" style="max-width:100%;border-radius:8px;">
+                        </div>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table class="result-table" id="result-table">
+                            <thead>
+                                <tr>
+                                    <th>群体</th>
+                                    <th>占比</th>
+                                </tr>
+                            </thead>
+                            <tbody id="result-tbody">
+                                <!-- 动态填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card-footer">
+                        <button class="btn btn-ghost" onclick="backToPreview()">← 返回预览</button>
+                        <button class="btn btn-primary btn-lg" id="btn-to-ai" onclick="goToAIResults()">
+                            查看AI分析
+                            <span class="btn-icon-right">→</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 4: AI Analysis + Chat Consultation -->
+            <section class="section" id="section-chat">
+                <!-- AI Analysis Results -->
+                <div class="card result-card" id="ai-results-card" style="margin-bottom:16px;">
+                    <div class="result-header">
+                        <h2 class="card-title">AI分析结果</h2>
+                    </div>
+                    <div class="ai-cards-container" id="ai-cards-container">
+                        <!-- 动态填充 -->
+                    </div>
+                </div>
+
+                <!-- Chat Consultation -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">课程咨询</h2>
+                            <p class="card-desc">选择群体类型，与AI助手对话获取个性化课程推荐</p>
+                        </div>
+                        <button class="btn btn-ghost" onclick="backToClustering()">返回聚类分析</button>
+                    </div>
+
+                    <div class="chat-type-select">
+                        <span class="chat-label">选择群体类型：</span>
+                        <div class="type-chips" id="type-chips">
+                            <!-- 动态填充 -->
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-message bot">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">您好！我是体育课程推荐助手。请选择您的群体类型，然后输入您的问题。</div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-row">
+                        <input type="text" id="chat-input" placeholder="输入您的问题，如：膝盖不太好有什么推荐？" disabled>
+                        <button class="btn btn-primary" id="chat-send" onclick="sendChat()" disabled>
+                            <span class="btn-text">发送</span>
+                            <span class="btn-loading" style="display:none;">
+                                <span class="spinner-small"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>北京体育大学</p>
+        </footer>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="/static/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "summary": {
+    "MiniMax": {
+      "avg_time": 39.75292181968689,
+      "success_rate": 0.0,
+      "format_score": 0,
+      "content_length": 0
+    },
+    "Doubao": {
+      "avg_time": 0.07500370343526204,
+      "success_rate": 0.0,
+      "format_score": 0,
+      "content_length": 0
+    }
+  },
+  "mm_responses": [],
+  "db_responses": [],
+  "mm_times": [
+    39.37125611305237,
+    37.257670164108276,
+    42.629839181900024
+  ],
+  "db_times": [
+    0.08379507064819336,
+    0.0701761245727539,
+    0.07103991508483887
+  ]
+}

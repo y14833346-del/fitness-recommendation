@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.DS_Store
+data/*.xlsx
+data/*.csv
+data/*.png
+*.log
+.claude/
+venv/
+env/
+*.docx
+*.zip
+data/uploaded_file.xlsx
