@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+ENV PORT=7860
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_RUN_PORT=7860
 
